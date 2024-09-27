@@ -90,3 +90,47 @@ ipcMain.on('actualizar-afiliado', (event, afiliado) => {
         }
     });
 });
+
+ipcMain.on('dar-baja-afiliado', (event, id) => {
+    const sql = 'UPDATE afiliados SET estado = "baja", fecha_baja = CURRENT_DATE WERE id = ?';
+    connection.query(sql, [id], (err, result) => {
+        if (err) {
+            event.reply('respuesta-dar-baja-afiliado', {success: false, error: err.message});
+        } else {
+            event.reply('respuesta-dar-baja-afiliado',{success: true});
+        }
+    });
+});
+
+ipcMain.on('listar-afiliados', (event, filtro) => {
+    let sql;
+
+    if (filtro === 'activos') {
+        sql = 'SELECT * FROM afiliados WHERE estado = "activo"';
+    } else if (filtro === 'baja') {
+        sql = 'SELECT * FROM afiliados WHERE estado = "baja"';
+    } else {
+        sql = 'SELECT * FROM afiliados'
+    }
+
+    connection.query(sql, (err,results) => {
+        if (err) {
+            event.reply('respuesta-listar-afiliados', {success: false, error: err.message});
+        } else {
+            event.reply('respuesta-listar-afiliados', {status: true, afiliados: results});
+        }
+    });
+});
+
+ipcMain.on('actualizar-afiliado', (event, afiliado) => {
+    const {id, nombre, apellido, dni, empresa, fecha_ingreso} = afiliado;
+
+    const sql = 'UPDATE afiliados SET nombre = nombre = ?, apellido = ?, dni = ?, empresa = ?, fecha_ingreso = ?';
+    connection.query(sql, [nombre, apellido, dni, empresa, fecha_ingreso, id], (err, result) => {
+        if (err) {
+            event.reply('respuesta-actualizar-afiliado', {success: false, error: err.message});
+        } else {
+            event.reply('respuesta-actualizar-afiliado', {success: true});
+        }
+    });
+});
