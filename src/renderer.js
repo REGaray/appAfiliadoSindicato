@@ -67,3 +67,7 @@ window.electronAPI.onActualizarAfiliado((response) => {
     }
 });
 
+document.getElementById('darBajaAfiliado').addEventListener('click', () => {
+    const afiliadoId = document.getElementById('afiliadoId').value;
+    
+})

@@ -134,3 +134,15 @@ ipcMain.on('actualizar-afiliado', (event, afiliado) => {
         }
     });
 });
+
+//Eliminar afiliado
+ipcMain.on('dar-baja-afiliado', (event, id) => {
+    const sql = 'UPDATE afiliados SET estado = "baja", fecha_baja = CURRENT_DATE WHERE id = ?';
+    connection.query(sql, [id], (err, result) => {
+        if(err) {
+            event.reply('respuesta-dar-baja-afiliado', {success: false, error: err.message});
+        } else {
+            event.reply('respuesta-dar_baja_afiliado', {succes: true});
+        }
+    });
+});
