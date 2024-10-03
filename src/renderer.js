@@ -67,7 +67,67 @@ window.electronAPI.onActualizarAfiliado((response) => {
     }
 });
 
+//Lógica del botón para dar de baja afiliado
 document.getElementById('darBajaAfiliado').addEventListener('click', () => {
     const afiliadoId = document.getElementById('afiliadoId').value;
-    
-})
+    window.electronAPI.darBajaAfiliado(afiliadoId);
+});
+
+//Escucha desde el backend la función para dar de baja afiliado
+window.electronAPI.onDarBajaAfiliado((response) => {
+    if(response.success) {
+        console.log('Afiliado dado de baja exitosamente');
+    } else {
+        console.log('Error al dar de baja al afiliado: ',response.error);
+    }
+});
+
+
+//VALIDACIONES DE DATOS
+
+//Validaciones de Afiliados
+function validarAfiliado(afiliado) {
+    let errores = [];
+
+    //validamos los campos que consideramos requeridos como obligatorios
+    if(!afiliado.nombre) errores.push("El nombre es obligatorio");
+    if(!afiliado.apellido) errores.push("El apellido es obligatorio");
+    if(!afiliado.dni) errores.push("El DNI es obligatoorio");
+    if(!afiliado.empresa) errores.push("La empresa es obligatoria");
+    if(!afiliado.fecha_ingreso) errores.push("La fecha de ingreso es obligatoria");
+
+    //validamos que el DNI sea de tipo numérico (sólo números)
+    if(afiliado.dni && !/^\d+$/.test(afiliado.dni)) {
+        errores.push("El DNI debe contener sólo números");
+    }
+
+    //validamos que la fecha de ingreso no es posterior a la de hoy
+    const fechaActual = new Date();
+    const fechaIngreso = new Date(afiliado.fecha_ingreso);
+    if (fechaIngreso > fechaActual) {
+        errores.push("La fecha de ingreso no puede ser futura");
+    }
+
+    return errores;
+};
+
+//integración de la validación con el evento de crear o actualizar afiliado
+document.getElementById('crearAfiliado').addEventListener('click', () => {
+    const afiliado = {
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        dni: document.getElementById('dni').value,
+        empresa: document.getElementById('empresa').value,
+        fecha_ingreso: document.getElementById('fecha_ingreso').value
+    };
+
+    //Validación
+    const errores = validarAfiliado(afiliado);
+
+    if (errores.length > 0){
+        alert('Se han encontrado errores en la operación: \n'+errores.join('\n'));
+    } else {
+        //si no hay errores, se continúa con la modificación o alta del afiliado
+        window.electronAPI.crearAfiliado(afiliado);
+    }
+});

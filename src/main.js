@@ -146,3 +146,32 @@ ipcMain.on('dar-baja-afiliado', (event, id) => {
         }
     });
 });
+
+ipcMain.on('crear-afiliado', (even,afiliado) => {
+    let errores = [];
+
+    //validaciones en el backend
+    if(!afiliado.nombre || afiliado.nombre.trim() === '') errores.push("El nombre es obligatorio");
+    if(!afiliado.apellido || afiliado.apellido.trim() === '') errores.push("El apellido es obligatorio");
+    if(!afiliado.dni || !/^\d+$/.test(afiliado.dni)) errores.push("El Dni es obligatorio");
+    if(!afiliado.empresa) errores.push("La empresa es obligatoria");
+    if(!afiliado.fecha_ingreso || isNaN(Date.parse(afiliado.fecha_ingreso))) {
+        errores.push("La fecha de ingreso es obligatoria y debe ser válida");
+    } 
+
+    //verificamos si hay errores
+    if(errores.length > 0) {
+        event.reply('respuesta-crear-afiliado', {success: false, error: errores.join(', ')});
+        return;
+    }
+
+    //si está todo bien, se inserta el afiliado en la base de datos
+    const sql = 'INSERT INTO afiliados (nombre, apellido, dni, empresa, fecha_ingreso, estado) VALUES (?, ?, ?, ?, ?, "activo")';
+    connection.query(sql, [afiliado.nombre, afiliado.apellido, afiliado.dni, afiliado.empresa, afiliado.fecha_ingreso], (err, result) => {
+        if(err) {
+            event.reply('respuesta-crear-afiliado', {success: false, error: err.message});
+        } else {
+            event.reply('respuesta-crear-afiliado', {success: true});
+        }
+    });
+});

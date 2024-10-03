@@ -17,6 +17,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onActualizarAfiliado: (callback) => ipcRenderer.on('respuesta-actualizar-afiliado', (event, data) => callback(data))
 });
 
+//Dar de Baja adiliados
+contextBridge.exposeInMainWorld('electronAPI', {
+    darBajaAfiliado: (id) => ipcRenderer.send('dar-baja-afiliado', id),
+    onDarBajaAfiliado: (callback) => ipcRenderer.on('respuesta-dar-baja-afiliado', (event, data) => callback(data))
+});
+
 
 window.addEventListener('DOMContentLoaded', () => {
 
