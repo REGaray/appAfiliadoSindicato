@@ -1,72 +1,100 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Afiliados</title>
-    <link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-    <h1>Sindicato de Obras Sanitarias</h1>
-    <div id="app">
-        //<-- Aquí irá el contenido dinámico de la aplicación 
-    </div>
-    <script src="renderer.js"></script>
-</body>
-</html>  -->
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Sistema de Gestión de Afiliados</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <h1>Sistema de Gestión de Afiliados</h1>
+
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Sindicato Obras Sanitarias</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="nav-afiliados">Afiliados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-beneficios">Beneficios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-ayudas">Ayudas Económicas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-usuarios">Usuarios</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Afiliados</a></li>
-                <li><a href="#">Beneficios</a></li>
-                <li><a href="#">Ayudas Económicas</a></li>
-                <li><a href="#">Configuración</a></li>
-            </ul>
-        </nav>
-    </header>
+    </nav>
 
-    <main>
-        <section class="welcome-section">
-            <h2>Bienvenido al Sistema de Gestión de Afiliados</h2>
-            <p>Gestiona de manera eficiente la información de los afiliados, sus beneficios y las ayudas económicas.</p>
-            <button class="primary-btn">Ver Afiliados</button>
-        </section>
+    <!-- Contenedor principal -->
+    <div class="container mt-4" id="main-content">
+        <!-- Aquí cargamos dinámicamente las secciones (afiliados, beneficios, etc.) -->
+        <h2>Bienvenido al Sistema de Gestión de Afiliados</h2>
+        <p>Selecciona una opción del menú para comenzar.</p>
 
-        <section class="info-cards">
-            <div class="card">
-                <h3>Afiliados Activos</h3>
-                <p>Consulta, agrega y administra los afiliados activos del sistema.</p>
-            </div>
-            <div class="card">
-                <h3>Beneficios</h3>
-                <p>Gestiona los beneficios a los que pueden acceder los afiliados.</p>
-            </div>
-            <div class="card">
-                <h3>Ayudas Económicas</h3>
-                <p>Administra las solicitudes de ayuda económica de los afiliados.</p>
-            </div>
-        </section>
-    </main>
+        <!-- Formulario para gestionar afiliados -->
+        <div id="form-afiliados" style="display: none;">
+            <h3>Afiliados</h3>
+            <form id="afiliadoForm">
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" placeholder="Nombre del afiliado">
+                </div>
+                <div class="mb-3">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" placeholder="Apellido del afiliado">
+                </div>
+                <div class="mb-3">
+                    <label for="dni" class="form-label">DNI</label>
+                    <input type="text" class="form-control" id="dni" placeholder="DNI del afiliado">
+                </div>
+                <div class="mb-3">
+                    <label for="empresa" class="form-label">Empresa</label>
+                    <select class="form-control" id="empresa">
+                        <option value="Aguas de Corrientes">Aguas de Corrientes</option>
+                        <option value="Urbatec">Urbatec</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="fecha_ingreso" class="form-label">Fecha de Ingreso</label>
+                    <input type="date" class="form-control" id="fecha_ingreso">
+                </div>
+                <button type="button" class="btn btn-primary" id="guardarAfiliado">Guardar</button>
+            </form>
+        </div>
 
-    <footer>
-        <p>&copy; 2024 Sindicato de Obras Sanitarias. Todos los derechos reservados.</p>
-    </footer>
-    <script src="renderer.js"></script>
+        <!-- Listado de afiliados -->
+        <div id="lista-afiliados" style="display:none;">
+            <h3>Listado de Afiliados</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>DNI</th>
+                        <th>Empresa</th>
+                        <th>Fecha de Ingreso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaAfiliadosBody">
+                    <!-- Aquí se insertarán los afiliados -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./renderer.js"></script>
 </body>
 </html>

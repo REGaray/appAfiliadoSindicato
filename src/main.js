@@ -19,7 +19,7 @@ function createWindow() {
 
 };
 
-//This event is invoked whe Electron is fully loaded
+//This event is invoked when Electron is fully loaded
 app.whenReady().then(() => {
     createWindow();
 
@@ -172,6 +172,31 @@ ipcMain.on('crear-afiliado', (even,afiliado) => {
             event.reply('respuesta-crear-afiliado', {success: false, error: err.message});
         } else {
             event.reply('respuesta-crear-afiliado', {success: true});
+        }
+    });
+});
+
+ipcMain.on('asignar-beneficio', (event, {afiliadoId, beneficioId,hijoEdad}) => {
+    let errores = [];
+
+    //validamos si es correcto el beneficio de escolaridad
+    if(beneficioId === 'escolaridad' && hijoEdad > 18) {
+        errores.push("El beneficio de escolaridad no puede ser asignado a hijos mayores de 18 años");
+    }
+
+    //si hay algún error en la asignación del beneficio, devolvemos el error
+    if(errores.length > 0) {
+        event.reply('respuesta-asignar-beneficio', {success: false, error: errores.join(', ')});
+        return;
+    }
+
+    //en caso de no encontrar errores, asignamos el beneficio
+    const sql = 'INSERT INTO beneficios_asignados (afiliado_id, beneficio_id, fecha_asignacion) VALUES (?, ?, CURRENT DATE)';
+    connection.query(sql, [afiliadoId, beneficioId], (err,result) => {
+        if(err) {
+            event.reply('respuesta-asignar-beneficio', {success: false, error: err.message});
+        } else {
+            event.reply('respuesta-asignar-beneficio', {success: true});
         }
     });
 });

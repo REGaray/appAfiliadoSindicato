@@ -1,3 +1,70 @@
+//Integración con index.hmtl
+//Mostrar y cargar afiliados
+document.getElementById('nav-afiliados').addEventListener('click', () => {
+    ocultarSecciones();
+    document.getElementById('form-afiliados').style.display = 'block';
+    document.getElementById('lista-afiliados').style.display = 'block';
+    //cargarAfiliados();
+});
+
+//Mostrar Sección Beneficios
+document.getElementById('nav-beneficios').addEventListener('click', () => {
+    mostrarSeccion('form-beneficios');
+});
+
+//Mostrar Sección Ayuda
+document.getElementById('nav-ayudas').addEventListener('click', () =>{
+    mostrarSeccion('form-ayudas');
+});
+
+//Mostrar Sección Usuarios
+document-getElementById('nav-usuarios').addEventListener('click', () => {
+    mostrarSeccion('form-usuarios');
+});
+
+//Función reutilizable para Mostrar Secciones
+function mostrarSeccion(seccionId) {
+    document.getElementById('form-afiliados').style.display = 'none';
+    document.getElementById('lista-afiliados').style.display = 'none';
+    document.getElementById(seccionId).style.display = 'block';
+}
+
+//Función que muestra los formularios asociados a Afiliados al hacer click en "Afiliados"
+/* document.getElementById('nav-afiliados').addEventListener('click', () => {
+    ocultarSecciones();
+    document.getElementById('form-afiliados').style.display = 'block';
+    document.getElementById('lista-afiliados').style.display = 'block';
+}) */
+
+//Función reutilizable para Ocultar Secciones
+function ocultarSecciones() {
+    document.getElementById('form-afiliados').style.display = 'none';
+    document.getElementById('lista-afiliados').style.display = 'none';
+    //agregar las otras secciones del menú
+}
+
+//Función para Cargar Afiliados
+window.electronApi.obtenerAfiliados((afiliados) => {
+    const tablaBody = document.getElementById('tablaAfiliadosBody');
+    tablaBody.innerHTML = '';
+    afiliados.forEach(afiliado => {
+        const fila =
+        `<tr>
+            <td>${afiliado.id}</td>
+            <td>${afiliado.nombre}</td>
+            <td>${afiliado.apellido}</td>
+            <td>${afiliado.dni}</td>
+            <td>${afiliado.empresa}</td>
+            <td>${afiliado.fecha_ingreso}</td>
+            <td>
+                <button class="btn btn-warning btn-sm" onclick="editarAfiliado(${afiliado.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="eliminarAfiliado(${afiliado.id})">Eliminar</button>            
+            </td>
+        </tr>`;
+        tablaBody.innerHTML += fila;
+    });
+});
+
 document.getElementById('crearAfiliado').addEventListener('click', () => {
     const afiliado = {
         nombre: document.getElementById('nombre').value,
@@ -8,11 +75,12 @@ document.getElementById('crearAfiliado').addEventListener('click', () => {
     };
 
     //Se envían los datos al backend para crear el afiliado
-    window.electronAPI.crearAfiliado(afiliado);
+    Window.electronApi.crearAfiliado(afiliado);
+    
 });
 
 //Se habilita la escucha del backend
-window.electronAPI.onCrearAfiliado((responde) => {
+window.electronApi.onCrearAfiliado((response) => {
     if (response.success) {
         console.log('Afiliado creado exitosamente (ID: ',response.id);
     } else {
@@ -22,16 +90,16 @@ window.electronAPI.onCrearAfiliado((responde) => {
 
 //Botón listar afiliados activos
 document.getElementById('listarAfiliadosActivos').addEventListener('click', () => {
-    window.electronAPI.listarAfiliados('activos');
+    window.electronApi.listarAfiliados('activos');
 });
 
 //Botón listar afiliados inactivos
 document.getElementById('listarAfiliadosInactivos').addEventListener('click', () => {
-    window.electronAPI.listarAfiliados('baja');
+    window.electronApi.listarAfiliados('baja');
 });
 
 //Se escucha la respuesta del backend a los botones de listar afiliados
-window.electronAPI.onListarAfiliados((response) => {
+window.electronApi.onListarAfiliados((response) => {
     if(response.success) {
         const afiliados = response.afiliados;
         let html = '';
@@ -55,12 +123,12 @@ document.getElementById('actualizarAfiliado').addEventListener('click'), () => {
         fecha_ingreso: document.getElementById('fecha_ingreso').value
     };
 
-    window.electronAPI.actualizarAfiliado(afiliado);
+    window.electronApi.actualizarAfiliado(afiliado);
 };
 
 //escuchamos la respuesta del backend
-window.electronAPI.onActualizarAfiliado((response) => {
-    if (responde.success) {
+window.electronApi.onActualizarAfiliado((response) => {
+    if (response.success) {
         console.log('Afiliado actualizado exitosamente');
     } else {
         console.error('Error al actualizar afiliado: ', response.error);
@@ -70,11 +138,11 @@ window.electronAPI.onActualizarAfiliado((response) => {
 //Lógica del botón para dar de baja afiliado
 document.getElementById('darBajaAfiliado').addEventListener('click', () => {
     const afiliadoId = document.getElementById('afiliadoId').value;
-    window.electronAPI.darBajaAfiliado(afiliadoId);
+    window.electronApi.darBajaAfiliado(afiliadoId);
 });
 
 //Escucha desde el backend la función para dar de baja afiliado
-window.electronAPI.onDarBajaAfiliado((response) => {
+window.electronApi.onDarBajaAfiliado((response) => {
     if(response.success) {
         console.log('Afiliado dado de baja exitosamente');
     } else {
@@ -128,6 +196,17 @@ document.getElementById('crearAfiliado').addEventListener('click', () => {
         alert('Se han encontrado errores en la operación: \n'+errores.join('\n'));
     } else {
         //si no hay errores, se continúa con la modificación o alta del afiliado
-        window.electronAPI.crearAfiliado(afiliado);
+        window.electronApi.crearAfiliado(afiliado);
     }
 });
+
+
+//Mensajes de Retroalimentación (errores y ok)
+window.electronApi.onCrearAfiliado((response) => {
+    if(response-success) {
+        alert('Afiliado creado exitosamente');
+    } else {
+        alert('Error al crear afiliado: '+response.error);
+    }
+});
+

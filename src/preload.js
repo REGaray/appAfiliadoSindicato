@@ -1,24 +1,18 @@
 const {contextBridge, ipcRenderer} = require('electron');
 
-contextBridge.exposeInMainWorld('electronAPI', {
-    crearAfiliado: (afiliado) => ipcRenderer.send('crear-afiliado', afiliado),
-    onCrearAfiliado: (callback) => ipcRenderer.on('respuesta-crear-afiliado', (event, data) => callback(data))
-});
-
-//Listar afiliados
 contextBridge.exposeInMainWorld('electronApi', {
+    crearAfiliado: (afiliado) => ipcRenderer.send('crear-afiliado', afiliado),
+    onCrearAfiliado: (callback) => ipcRenderer.on('respuesta-crear-afiliado', (event, data) => callback(data)),
+
+    //Listar afiliados
     listarAfiliados: (filtro) => ipcRenderer.send('listar-afiliados', filtro),
-    onListarAfiliados: (callback) => ipcRenderer.on('respuesta-listar-afiliados', (event, (event, data) => callback(data)))
-});
+    onListarAfiliados: (callback) => ipcRenderer.on('respuesta-listar-afiliados', (event, data) => callback(data)),
 
-//Actualizar afiliados
-contextBridge.exposeInMainWorld('electronAPI', {
+    //Actualizar afiliados
     actualizarAfiliado: (afiliado) => ipcRenderer.send('actualizar-afiliado',afiliado),
-    onActualizarAfiliado: (callback) => ipcRenderer.on('respuesta-actualizar-afiliado', (event, data) => callback(data))
-});
+    onActualizarAfiliado: (callback) => ipcRenderer.on('respuesta-actualizar-afiliado', (event, data) => callback(data)),
 
-//Dar de Baja adiliados
-contextBridge.exposeInMainWorld('electronAPI', {
+    //Dar de Baja afiliados
     darBajaAfiliado: (id) => ipcRenderer.send('dar-baja-afiliado', id),
     onDarBajaAfiliado: (callback) => ipcRenderer.on('respuesta-dar-baja-afiliado', (event, data) => callback(data))
 });
