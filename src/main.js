@@ -200,3 +200,15 @@ ipcMain.on('asignar-beneficio', (event, {afiliadoId, beneficioId,hijoEdad}) => {
         }
     });
 });
+
+
+
+//Validaciones y autenticaciones de roles (por medio de una tabla en la base de datos)
+ipcMain.handle('autenticar-usuario', async(event, username, password) => {
+    const usuario = await autenticarUsuarioEnBD(username, password);
+    if(usuario) {
+        return {rol: usuario.rol};
+    } else {
+        throw new Error('Autenticación fallida');
+    }
+});
