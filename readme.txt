@@ -13,6 +13,7 @@ Instalación requerida
     npm install -g electron
     npm init -y
     npm install --save-dev electron
+    npm install csv-parser xlsx
 
 4. Para ejecutar, utilizar el comando
     npm start

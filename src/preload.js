@@ -14,7 +14,10 @@ contextBridge.exposeInMainWorld('electronApi', {
 
     //Dar de Baja afiliados
     darBajaAfiliado: (id) => ipcRenderer.send('dar-baja-afiliado', id),
-    onDarBajaAfiliado: (callback) => ipcRenderer.on('respuesta-dar-baja-afiliado', (event, data) => callback(data))
+    onDarBajaAfiliado: (callback) => ipcRenderer.on('respuesta-dar-baja-afiliado', (event, data) => callback(data)),
+
+    //Importar archivos
+    importarArchivo: (filePath) => ipcRenderer.invoke('importar-archivo', filePath)
 });
 
 
