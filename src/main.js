@@ -209,6 +209,15 @@ ipcMain.handle('autenticar-usuario', async(event, username, password) => {
     if(usuario) {
         return {rol: usuario.rol};
     } else {
-        throw new Error('Autenticación fallida');
+        throw new Error('Usuario o contraseña incorrectos');
     }
 });
+
+//PARA QUE FUNCIONEN LOS ROLES, SE TIENE QUE AGREGAR EN LA BASE DE DATOS UNA TABLA PARECIDA A LA SIGUIENTE:
+/* CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE,
+    password VARCHAR(255),  -- Debes usar hashing de contraseñas
+    rol ENUM('sysadmin', 'administrador', 'secretaria', 'contable')
+);
+ */
