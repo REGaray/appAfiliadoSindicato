@@ -1,6 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const mysql = require('mysql2');
+const fs = require('fs');
+const csvParser = require('csv-parser');
+const xlsx = require('xlsx');
 
 //We create the main window of the desktop app
 function createWindow() {
@@ -221,3 +224,124 @@ ipcMain.handle('autenticar-usuario', async(event, username, password) => {
     rol ENUM('sysadmin', 'administrador', 'secretaria', 'contable')
 );
  */
+
+//Lógica para manejar la importación de un archivo
+ipcMain.handle('importar-archivo', async (event, filePath) => {
+    const extension = filePath.split('.').pop().toLowerCase();
+    let registros;
+
+    if (extension === 'csv') {
+        registros = await importarCSV(filePath);
+    } else if (extension === 'xlsx') {
+        registros = await importarExcel(filePath);
+    } else {
+        throw new Error('Formato de archivo no soportado. Sólo csv o xlsx');
+    }
+
+    const registrosValidados = validarRegistros(registros);
+    await insertarRegistrosEnBD(registrosValidados);
+
+    return 'Importación exitosa';
+});
+
+function importarCSV(filePath) {
+    return new Promise((resolve, reject) => {
+        const registros = [];
+        fs.createReadStream(filePath)
+            .pipe(csvParser())
+            .on('data', (row) => {
+                resolve(registros);
+            })
+            .on('error', (error) => reject(error));
+    });
+}
+
+function importarExcel(filePath) {
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const registros = xlsx.utils.sheet_to_json(sheet);
+    return registros;
+}
+
+function validarRegistros(registros) {
+    const errores = [];
+    registros.forEach((registro, index) => {
+        if(!registro.nombre || registro.apellido) {
+            errores.push(`Fila ${index + 1}: Nombre o Apellido faltante`);
+        }
+        if(!registro.dni || isNaN(registro.dni)) {
+            errores.push(`Fila ${index +1}: DNI inválido`);
+        }
+    });
+
+    if (errores.length > 0) {
+        throw new Error(`Errores encontrados: \n${errores.join('\n')}`);
+    }
+
+    return registros;
+}
+
+//EJEMPLO DE INSERCIÓN MASIVA A LA BASE DE DATOS
+/* const mysql = require('mysql2/promise');
+
+async function insertarRegistrosEnBD(registros) {
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'sindicato'
+    });
+
+    try {
+        await connection.beginTransaction();
+
+        for (const registro of registros) {
+            const [result] = await connection.execute(
+                `INSERT INTO afiliados (nombre, apellido, dni, empresa, localidad)
+                VALUES (?, ?, ?, ?, ?)`,
+                [registro.nombre, registro.apellido, registro.dni, registro.empresa, registro.localidad]
+            );
+        }
+
+        await connection.commit();
+        console.log('Registros importados exitosamente');
+    } catch (error) {
+        await connection.rollback();
+        throw new Error('Error al insertar registros: ' + error.message);
+    } finally {
+        await connection.end();
+    }
+} */
+
+//Lógica que abre un cuadro de diálogo nativo del sistema para seleccionar un archivo
+app.whenReady().then()(() => {
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+        }
+    });
+
+    mainWindow.loadFile('index.html');
+});
+
+//Lógica del cuadro de diálogo para seleccionar el archivo
+ipcMain.handle('dialog:openFile', async () => {
+    const {canceled, filePath} = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+            {name: 'Archivos CSV o Excel', extensions: ['csv', 'xlsx']}
+        ]
+    });
+
+    if (canceled) {
+        //si el usuario cancela, no se devuelve nada (null)
+        return null;
+    } else {
+        //si el usuario confirma, se devuelve el archivo seleccionado
+        return filePath[0];
+    }
+});

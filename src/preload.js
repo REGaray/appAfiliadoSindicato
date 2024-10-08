@@ -17,7 +17,11 @@ contextBridge.exposeInMainWorld('electronApi', {
     onDarBajaAfiliado: (callback) => ipcRenderer.on('respuesta-dar-baja-afiliado', (event, data) => callback(data)),
 
     //Importar archivos
-    importarArchivo: (filePath) => ipcRenderer.invoke('importar-archivo', filePath)
+    importarArchivo: (filePath) => ipcRenderer.invoke('importar-archivo', filePath),
+
+    //Funcionalidad para abrir el cuadro de diálogo
+    importarArchivo: (filePath) => ipcRenderer.invoke('importar-archivo', filePath),
+    openFileDialog: () => ipcRenderer.invoke('dialog:openFile')
 });
 
 

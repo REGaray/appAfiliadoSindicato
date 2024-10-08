@@ -112,6 +112,44 @@ Window.electronApi.onListarAfiliados((response) => {
     }
 });
 
+//Lógica que maneja la carga masiva de Afiliados
+document.getElementById('btnImportar').addEventListener('click', async () => {
+    //Abre el cuadro de diálogo para seleccionar el archivo
+    const filePath = await Window.electronApi.openFileDialog();
+
+    if(filePath) {
+        window.electronApi.importarArchivo(filePath)
+            .then((message) => {
+                alert(message)
+            })
+            .catch((error) => {
+                alert(`Error: ${error.message}`);
+            })
+    } else {
+        alert('No se seleccionó ningún archivo');
+    }
+});
+
+//Codigo simple anterior
+/* document.getElementById('btnImportar').addEventListener('click', () => {
+    //Abre el cuadro de diálogo para seleccionar el archivo
+    document.getElementById('fileInput').click();
+}); */
+
+document.getElementById('fileInput').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if(file) {
+        //Envía la ruta de acceso del archivo al backend para procesar
+        Window.electronApi.importarArchivo(file.path)
+            .then((message) => {
+                alert(message);
+            })
+            .catch((error) => {
+                alert(`Error: $(error.message)`);
+            })
+    }
+});
+
 //lectura del contenido del formulario para actualizar afiliado
 document.getElementById('actualizarAfiliado').addEventListener('click'), () => {
     const afiliado = {
@@ -211,16 +249,8 @@ Window.electronApi.onCrearAfiliado((response) => {
 });
 
 
-//Lógica que maneja la carga masiva de Afiliados
-document.getElementById('btnImportar').addEventListener('click', () => {
-    //Abre el cuadro de diálogo para seleccionar el archivo
-    document.getElementById('fileInput').click();
+Window.electronApi.importarArchivo(filePath).then((message) => {
+    alert(message);
+}).catch((error) => {
+    alert(`Error:$(error.message)`);
 });
-
-document.getElementById('fileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if(file) {
-        //Envía la ruta de acceso del archivo al backend para procesar
-        Window.electronApi.importarArchivo(file.path);
-    }
-})
