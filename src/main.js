@@ -6,6 +6,18 @@ const csvParser = require('csv-parser');
 const xlsx = require('xlsx');
 
 //We create the main window of the desktop app
+/* function createWindow () {
+    const win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'), // Ruta al archivo preload.js
+        }
+    });
+
+    win.loadFile('index.html');
+} */
+
 function createWindow() {
     const mainWindow = new BrowserWindow({
         width: 900,
@@ -27,7 +39,9 @@ app.whenReady().then(() => {
     createWindow();
 
     app.on('activate', () =>{
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        };
     });
 });
 
@@ -250,6 +264,9 @@ function importarCSV(filePath) {
         fs.createReadStream(filePath)
             .pipe(csvParser())
             .on('data', (row) => {
+                registros.push(row);
+            })
+            .on('end', () => {
                 resolve(registros);
             })
             .on('error', (error) => reject(error));
@@ -328,9 +345,24 @@ app.whenReady().then()(() => {
     mainWindow.loadFile('index.html');
 });
 
+
+/* app.whenReady().then()(() => {
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+        }
+    });
+
+    mainWindow.loadFile('index.html');
+}); */
+
 //Lógica del cuadro de diálogo para seleccionar el archivo
-ipcMain.handle('dialog:openFile', async () => {
-    const {canceled, filePath} = await dialog.showOpenDialog({
+/* ipcMain.handle('dialog:openFile', async () => {
+    const {canceled, filePaths} = await dialog.showOpenDialog({
         properties: ['openFile'],
         filters: [
             {name: 'Archivos CSV o Excel', extensions: ['csv', 'xlsx']}
@@ -342,6 +374,47 @@ ipcMain.handle('dialog:openFile', async () => {
         return null;
     } else {
         //si el usuario confirma, se devuelve el archivo seleccionado
-        return filePath[0];
+        return filePaths[0];
+    }
+}); */
+
+ipcMain.handle('dialog:openFile', async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+            { name: 'Archivos CSV o Excel', extensions: ['csv', 'xlsx'] }
+        ]
+    });
+    if (result.canceled) {
+        return null;
+    } else {
+        return result.filePaths[0]; // Aseguramos que filePaths está definido
+    }
+});
+
+//Lógica para importar archivo
+ipcMain.handle('archivo:importar', async (event, filePath) => {
+    // Lógica para procesar el archivo
+    try {
+        // Aquí agregas la lógica para leer y procesar el archivo
+        return 'Archivo importado exitosamente';
+    } catch (error) {
+        throw new Error('Error al importar archivo');
+    }
+});
+
+app.whenReady().then(() => {
+    createWindow();
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
     }
 });
