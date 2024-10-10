@@ -21,7 +21,7 @@ contextBridge.exposeInMainWorld('electronApi', {
 
     //Funcionalidad para abrir el cuadro de diálogo
     openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),
-    importarArchivo: (filePath) => ipcRenderer.invoke('importar-archivo', filePath)
+    importarArchivo: (filePath) => ipcRenderer.invoke('importar:archivo', filePath)
 });
 
 

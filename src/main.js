@@ -240,7 +240,7 @@ ipcMain.handle('autenticar-usuario', async(event, username, password) => {
  */
 
 //Lógica para manejar la importación de un archivo
-ipcMain.handle('importar-archivo', async (event, filePath) => {
+ipcMain.handle('importar:archivo', async (event, filePath) => {
     const extension = filePath.split('.').pop().toLowerCase();
     let registros;
 
@@ -379,16 +379,21 @@ app.whenReady().then()(() => {
 }); */
 
 ipcMain.handle('dialog:openFile', async () => {
-    const result = await dialog.showOpenDialog({
-        properties: ['openFile'],
-        filters: [
-            { name: 'Archivos CSV o Excel', extensions: ['csv', 'xlsx'] }
-        ]
-    });
-    if (result.canceled) {
-        return null;
-    } else {
-        return result.filePaths[0]; // Aseguramos que filePaths está definido
+    try {
+        const result = await dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [
+                { name: 'Archivos CSV o Excel', extensions: ['csv', 'xlsx'] }
+            ],
+        });
+        if (result.canceled) {
+            return null;
+        } else {
+            return result.filePaths[0]; // Aseguramos que filePaths está definido
+        }
+    } catch (error) {
+        console.error('Error abriendo el cuadro de diálogo: ', error);
+        throw error;
     }
 });
 
